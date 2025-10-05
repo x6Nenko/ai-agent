@@ -38,7 +38,19 @@ def main():
         types.Content(role="user", parts=[types.Part(text=user_prompt)]),
     ]
 
-    generate_content(client, messages, verbose)
+    max_iterations = 20
+    for iteration in range(max_iterations):
+        try:
+            result = generate_content(client, messages, verbose)
+            if result:
+                print(result)
+                break
+        except Exception as e:
+            print(f"Error: {e}")
+            break
+    else:
+        print("Maximum iterations reached without a final response.")
+        sys.exit(1)
 
 
 def generate_content(client, messages, verbose):
@@ -53,6 +65,11 @@ def generate_content(client, messages, verbose):
     if verbose:
         print("Prompt tokens:", response.usage_metadata.prompt_token_count)
         print("Response tokens:", response.usage_metadata.candidates_token_count)
+
+    # Add all candidates to messages (usually just one)
+    if response.candidates:
+        for candidate in response.candidates:
+            messages.append(candidate.content)
 
     # Handle responses without function calls
     if not response.function_calls:
@@ -74,6 +91,12 @@ def generate_content(client, messages, verbose):
 
     if not function_responses:
         raise RuntimeError("No function responses generated")
+
+    # Convert function responses to a user message and add to conversation
+    messages.append(types.Content(role="user", parts=function_responses))
+
+    # Return None to indicate we need another iteration
+    return None
 
 
 if __name__ == "__main__":

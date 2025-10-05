@@ -1,29 +1,30 @@
-from functions.get_files_info import get_files_info
+from functions.get_file_content import get_file_content
 
 
 def main():
-    # Test 1: Current directory
-    result = get_files_info("calculator", ".")
-    print("Result for current directory:")
+    # Test 1: Read main.py
+    print("Test 1: get_file_content('calculator', 'main.py')")
+    result = get_file_content("calculator", "main.py")
     print(result)
     print()
 
-    # Test 2: Subdirectory
-    result = get_files_info("calculator", "pkg")
-    print("Result for 'pkg' directory:")
+    # Test 2: Read pkg/calculator.py
+    print("Test 2: get_file_content('calculator', 'pkg/calculator.py')")
+    result = get_file_content("calculator", "pkg/calculator.py")
     print(result)
     print()
 
-    # Test 3: Absolute path outside working directory
-    result = get_files_info("calculator", "/bin")
-    print("Result for '/bin' directory:")
-    print(f"    {result}")
+    # Test 3: Try to read outside working directory (should error)
+    print("Test 3: get_file_content('calculator', '/bin/cat')")
+    result = get_file_content("calculator", "/bin/cat")
+    print(result)
     print()
 
-    # Test 4: Relative path outside working directory
-    result = get_files_info("calculator", "../")
-    print("Result for '../' directory:")
-    print(f"    {result}")
+    # Test 4: Try to read non-existent file (should error)
+    print("Test 4: get_file_content('calculator', 'pkg/does_not_exist.py')")
+    result = get_file_content("calculator", "pkg/does_not_exist.py")
+    print(result)
+    print()
 
 
 if __name__ == "__main__":

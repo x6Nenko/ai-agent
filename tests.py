@@ -1,34 +1,58 @@
-from functions.get_file_content import get_file_content
-from functions.write_file import write_file
-from functions.run_python_file import run_python_file
-from functions.get_files_info import get_files_info
+#!/usr/bin/env python3
+import subprocess
+import sys
+
+
+def run_test(description, prompt, verbose=True):
+    """Run a test by executing main.py with the given prompt."""
+    print(f"\n{'='*60}")
+    print(f"TEST: {description}")
+    print(f"PROMPT: {prompt}")
+    print(f"{'='*60}")
+
+    cmd = ["python3", "main.py", prompt]
+    if verbose:
+        cmd.append("--verbose")
+
+    result = subprocess.run(cmd, capture_output=True, text=True)
+
+    print(result.stdout)
+    if result.stderr:
+        print("STDERR:", result.stderr)
+
+    if result.returncode != 0:
+        print(f"ERROR: Process exited with code {result.returncode}")
+        return False
+
+    return True
 
 
 def main():
-    # Test 1: "read the contents of main.py" -> get_file_content({'file_path': 'main.py'})
-    print("Test 1: get_file_content('.', 'main.py')")
-    result = get_file_content(".", "main.py")
-    print(result)
-    print()
+    print("Testing AI Agent Functions")
+    print("="*60)
 
-    # Test 2: "write 'hello' to main.txt" -> write_file({'file_path': 'main.txt', 'content': 'hello'})
-    print("Test 2: write_file('.', 'main.txt', 'hello')")
-    result = write_file(".", "main.txt", "hello")
-    print(result)
-    print()
+    tests = [
+        ("List directory contents", "List the files in the current directory"),
+        ("Get file contents", "Show me the contents of add.py"),
+        ("Write new file", "Create a new file called test_output.txt with the content 'This is a test file created by the AI agent'"),
+        ("Run Python tests", "Execute the tests.py file"),
+    ]
 
-    # Test 3: "run main.py" -> run_python_file({'file_path': 'main.py'})
-    print("Test 3: run_python_file('.', 'main.py')")
-    result = run_python_file(".", "main.py")
-    print(result)
-    print()
+    passed = 0
+    failed = 0
 
-    # Test 4: "list the contents of the pkg directory" -> get_files_info({'directory': 'pkg'})
-    print("Test 4: get_files_info('.', 'pkg')")
-    result = get_files_info(".", "pkg")
-    print(result)
-    print()
+    for description, prompt in tests:
+        if run_test(description, prompt, verbose=True):
+            passed += 1
+        else:
+            failed += 1
+
+    print(f"\n{'='*60}")
+    print(f"RESULTS: {passed} passed, {failed} failed out of {len(tests)} tests")
+    print(f"{'='*60}")
+
+    return 0 if failed == 0 else 1
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
